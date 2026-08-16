@@ -5,6 +5,7 @@ import HomePage from './components/pages/HomePage'
 import { ContactPage, ContentPage, LegalPage, ServicePage } from './components/pages/ContentPage'
 import WorkPage from './components/work/WorkPage'
 import ProjectPage from './components/work/ProjectPage'
+import NotFoundPage from './components/pages/NotFoundPage'
 
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 
@@ -22,7 +23,7 @@ export default function App() {
     <Route path="/industries" element={<ContentPage type="industries" />} />
     <Route path="/privacy" element={<LegalPage type="privacy" />} />
     <Route path="/terms" element={<LegalPage type="terms" />} />
-    <Route path="/not-found" element={<ContentPage type="notFound" />} />
-    <Route path="*" element={<ContentPage type="notFound" />} />
+    <Route path="/not-found" element={<NotFoundPage />} />
+    <Route path="*" element={<NotFoundPage />} />
   </Routes></SiteLayout>
 }

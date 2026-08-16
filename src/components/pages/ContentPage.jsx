@@ -1,15 +1,15 @@
 import { ArrowRight, ArrowUpRight, Check } from 'lucide-react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { industries, packages, projects, services, whatsappUrl } from '../../data/siteData'
 import ContactSection from '../contact/ContactSection'
 import { siteConfig } from '../../data/siteData'
+import NotFoundPage from './NotFoundPage'
 
 const pageCopy = {
   work: ['Selected work', 'Ideas made visible.', 'A mix of product concepts and selected work. Client projects will only appear here when the details and outcomes are approved for publication.'],
   services: ['Services', 'The right shape for your next move.', 'Strategy, design and development can work as one connected process—whether you need a focused website or a complete operational product.'],
   pricing: ['Ways to work together', 'Scope first. A clear quote second.', 'Choose the closest starting point below. I’ll learn what your project actually needs, then send a scope-specific quote with milestones and no surprise line items.'],
   industries: ['Industries', 'Digital products shaped around real work.', 'Different sectors need different journeys, workflows and trust signals. The technology follows the people and the business—not the other way around.'],
-  notFound: ['404 / Not found', 'This page has moved—or never existed.', 'The useful parts of the site are still close by. Head home, explore the work or start a conversation about your project.'],
 }
 
 function QuoteLink({ subject, children = 'Get a quote' }) {
@@ -32,7 +32,7 @@ export function ContentPage({ type }) {
 export function ServicePage() {
   const { slug } = useParams()
   const service = services.find(item => item.slug === slug)
-  if (!service) return <Navigate to="/not-found" replace />
+  if (!service) return <NotFoundPage contextLabel="SERVICE_NOT_FOUND" />
   const relevantPackages = service.slug === 'mobile-app-development' ? packages.slice(2, 3) : service.slug === 'business-systems' ? packages.slice(3) : packages.slice(0, 2)
   return <div className="inner-page section-pad">
     <section className="inner-hero"><p className="eyebrow">Service / {service.number}</p><h1>{service.title} that moves the business forward.</h1><p>{service.short}</p><Link className="button button-primary" to={`/contact?service=${service.slug}`}>Discuss this service <ArrowUpRight size={18} /></Link></section>

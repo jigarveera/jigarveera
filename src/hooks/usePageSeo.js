@@ -39,11 +39,14 @@ export default function usePageSeo(pathname) {
     const projectSlug = cleanPath.startsWith('/work/') ? cleanPath.split('/')[2] : null
     const service = services.find(item => item.slug === serviceSlug)
     const project = projects.find(item => item.slug === projectSlug && item.published)
-    const [shortTitle, fallbackDescription] = generic[cleanPath] || ['Page not found', 'Explore the digital product portfolio and services of Jigar Veera.']
+    const incompleteService = serviceSlug === 'ongoing-support'
+    const unknownRoute = !generic[cleanPath] && !service && !project
+    const isNotFound = cleanPath === '/not-found' || (projectSlug && !project) || (serviceSlug && !service) || unknownRoute
+    const [shortTitle, fallbackDescription] = isNotFound ? ['Page Not Found', 'The requested page could not be found on JigarVeera.in.'] : generic[cleanPath] || ['', '']
     const title = service ? `${service.seoTitle || `${service.title} for Businesses`} | Jigar Veera` : project ? `${project.seoTitle || project.title} | Jigar Veera` : `${shortTitle} | Jigar Veera`
     const description = service ? service.seoDescription : project ? project.excerpt : fallbackDescription
-    const keywords = service?.keywords || project?.keywords || searchKeywords[cleanPath] || ['Jigar Veera', 'digital product developer']
-    const canonical = `${baseUrl}${cleanPath === '/not-found' ? '/' : cleanPath}`
+    const keywords = isNotFound ? ['Jigar Veera'] : service?.keywords || project?.keywords || searchKeywords[cleanPath] || ['Jigar Veera', 'digital product developer']
+    const canonical = `${baseUrl}${cleanPath}`
     const socialImageSource = project?.media?.[0]?.src || siteConfig.logo
     const socialImage = new URL(socialImageSource, siteConfig.url).href
     const socialImageAlt = project?.media?.[0]?.alt || 'Jigar Veera JV logo'
@@ -63,9 +66,7 @@ export default function usePageSeo(pathname) {
     setMeta('meta[name="twitter:description"]', { name: 'twitter:description', content: description })
     setMeta('meta[name="twitter:image"]', { name: 'twitter:image', content: socialImage })
     setMeta('meta[name="twitter:image:alt"]', { name: 'twitter:image:alt', content: socialImageAlt })
-    const incompleteService = serviceSlug === 'ongoing-support'
-    const unknownRoute = !generic[cleanPath] && !service && !project
-    setMeta('meta[name="robots"]', { name: 'robots', content: cleanPath === '/not-found' || (projectSlug && !project) || (serviceSlug && !service) || incompleteService || unknownRoute ? 'noindex, nofollow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' })
+    setMeta('meta[name="robots"]', { name: 'robots', content: isNotFound || incompleteService ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' })
     let link = document.head.querySelector('link[rel="canonical"]')
     if (!link) { link = document.createElement('link'); link.rel = 'canonical'; document.head.appendChild(link) }
     link.href = canonical

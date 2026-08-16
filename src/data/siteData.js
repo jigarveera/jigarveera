@@ -20,7 +20,7 @@ export const siteConfig = {
   location: 'India · Available worldwide',
   timezone: 'Asia/Kolkata',
   responseWindow: 'Usually within 1–2 business days',
-  github: 'https://github.com/jigarveera',
+  github: 'https://github.com/JIG555ERA',
   linkedin: 'https://www.linkedin.com/in/jigarveera/',
 }
 

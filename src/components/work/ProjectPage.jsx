@@ -1,12 +1,13 @@
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check } from 'lucide-react'
-import { Link, Navigate, useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { projects } from '../../data/siteData'
+import NotFoundPage from '../pages/NotFoundPage'
 
 export default function ProjectPage() {
   const { slug } = useParams()
   const published = projects.filter(item => item.published)
   const index = published.findIndex(item => item.slug === slug)
-  if (index < 0) return <Navigate to="/not-found" replace />
+  if (index < 0) return <NotFoundPage contextLabel="PROJECT_NOT_FOUND" />
   const project = published[index]
   const previous = published[(index - 1 + published.length) % published.length]
   const next = published[(index + 1) % published.length]
