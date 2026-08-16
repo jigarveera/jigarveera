@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 
 const OnTextFlicker = ({ text = "coming soon" }) => {

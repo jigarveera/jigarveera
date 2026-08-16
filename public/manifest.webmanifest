@@ -1,0 +1,25 @@
+{
+  "name": "Jigar Veera — Digital Product Developer",
+  "short_name": "Jigar Veera",
+  "description": "Distinctive websites, mobile apps and business systems designed and built by Jigar Veera.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#080908",
+  "theme_color": "#080908",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}
