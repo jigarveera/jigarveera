@@ -24,6 +24,5 @@ export default function BlogShareFloat({ pathname }) {
 
   return <button className="blog-share-float" type="button" onClick={share} aria-label={copied ? 'Link copied' : `Share ${post ? 'this story' : `${topic.name}'s journal`}`}>
     {copied ? <Check size={20} /> : <Share2 size={20} />}
-    <span>{copied ? 'Copied' : 'Share'}</span>
   </button>
 }

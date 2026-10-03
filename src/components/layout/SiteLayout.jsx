@@ -7,6 +7,7 @@ import ScrollProgress from '../motion/ScrollProgress'
 import usePageSeo from '../../hooks/usePageSeo'
 import { getTopic } from '../../data/blogData'
 import BlogShareFloat from '../blog/BlogShareFloat'
+import SocialIcon from '../ui/SocialIcon'
 
 const nav = [['Work', '/work'], ['Services', '/services'], ['Blog', '/blogs'], ['About', '/about'], ['Contact', '/contact']]
 
@@ -59,7 +60,7 @@ export default function SiteLayout({ children }) {
           <Link to="/" className="footer-brand">Jigar<br />Veera<span>.</span></Link>
           <div><small>Contact</small><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><a href={whatsappUrl()} target="_blank" rel="noreferrer">WhatsApp</a></div>
           <div><small>Explore</small><Link to="/services">Services</Link><Link to="/work">Selected work</Link><Link to="/about">About</Link></div>
-          {blogTopic?.slug === 'ruby' ? <div><small>Ruby social</small>{[['Instagram', 'instagram'], ['Facebook', 'facebook'], ['YouTube Shorts', 'youtubeShorts']].map(([label, key]) => blogTopic.social?.[key] ? <a key={key} href={blogTopic.social[key]} target="_blank" rel="noreferrer">{label} ↗</a> : <span key={key}>{label} · soon</span>)}</div> : <div><small>Social</small><a href={siteConfig.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a><a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub ↗</a></div>}
+          {blogTopic?.slug === 'ruby' ? <div><small>Ruby social</small><div className="footer-social-links">{[['instagram', 'Instagram', 'instagram'], ['facebook', 'Facebook', 'facebook'], ['youtube', 'YouTube Shorts', 'youtubeShorts']].map(([icon, label, key]) => blogTopic.social?.[key] ? <a key={key} href={blogTopic.social[key]} target="_blank" rel="noreferrer" aria-label={`Ruby on ${label}`} title={label}><SocialIcon name={icon} /></a> : <span key={key} aria-label={`${label} link coming soon`} title={`${label} link coming soon`}><SocialIcon name={icon} /></span>)}</div></div> : <div><small>Social</small><div className="footer-social-links"><a href={siteConfig.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" title="LinkedIn"><SocialIcon name="linkedin" /></a><a href={siteConfig.github} target="_blank" rel="noreferrer" aria-label="GitHub" title="GitHub"><SocialIcon name="github" /></a></div></div>}
         </div>
         <div className="footer-legal"><span>© {new Date().getFullYear()} Jigar Veera</span><LocalTime /><span><Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link></span></div>
       </footer>

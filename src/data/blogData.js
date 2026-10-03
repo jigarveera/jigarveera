@@ -9,7 +9,7 @@ export const blogTopics = [
     description: 'A tiny world, a magnificent set of red knees. Follow Ruby’s days, one entry at a time.',
     shortDescription: 'Daily dispatches from a Mexican red knee tarantula.',
     theme: 'ruby', color: '#e96b3b', featured: true,
-    image: '/blog/ruby/stock-detail.webp', imageTemporary: true,
+    image: '/blog/ruby/stock-detail.webp', profileImage: '/blog/ruby/profile.png', imageTemporary: true,
     author: { name: 'Jigar Veera', image: '/jigarveeraLogo.png', role: 'Ruby’s human' },
     social: { instagram: null, facebook: null, youtubeShorts: null },
     posts: rubyBlogs,

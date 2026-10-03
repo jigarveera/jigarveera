@@ -1,33 +1,34 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, BookOpen, Check, ChevronRight, Clock3, Link2, List, Play, Search } from 'lucide-react'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronRight, Clock3, Link2, List, Play, Search } from 'lucide-react'
 import { Link, useParams } from 'react-router-dom'
 import { blogTopics, getAllBlogPosts, getTopic } from '../../data/blogData'
 import { siteConfig } from '../../data/siteData'
 import NotFoundPage from '../pages/NotFoundPage'
+import SocialIcon from '../ui/SocialIcon'
 import './blog.css'
 
 const postPath = (topic, post) => `/blogs/${topic.slug}/${post.id}`
 const readableDay = (id) => id.replace('-', ' ').toUpperCase()
 const clampSidebarWidth = (value) => Math.max(240, Math.min(440, Math.floor(window.innerWidth * .35), value))
 const rubySocialPlatforms = [
-  { key: 'instagram', label: 'Instagram', mark: 'IG' },
-  { key: 'facebook', label: 'Facebook', mark: 'f' },
-  { key: 'youtubeShorts', label: 'YouTube Shorts', mark: '▶' },
+  { key: 'instagram', label: 'Instagram', icon: 'instagram' },
+  { key: 'facebook', label: 'Facebook', icon: 'facebook' },
+  { key: 'youtubeShorts', label: 'YouTube Shorts', icon: 'youtube' },
 ]
 
 function TopicSocialLinks({ topic, compact = false }) {
-  const platforms = topic.slug === 'ruby' ? rubySocialPlatforms : Object.entries(topic.social || {}).filter(([, url]) => url).map(([key]) => ({ key, label: key, mark: '↗' }))
+  const platforms = topic.slug === 'ruby' ? rubySocialPlatforms : Object.entries(topic.social || {}).filter(([, url]) => url).map(([key]) => ({ key, label: key, icon: 'external' }))
   if (!platforms.length) return null
   return <div className={`blog-topic-socials ${compact ? 'is-compact' : ''}`} aria-label={`${topic.name} social profiles`}>
     {platforms.map(platform => topic.social?.[platform.key]
-      ? <a key={platform.key} href={topic.social[platform.key]} target="_blank" rel="noreferrer" aria-label={`${topic.name} on ${platform.label}`}><b>{platform.mark}</b><span>{platform.label}</span><ArrowUpRight size={14} /></a>
-      : <span className="is-pending" key={platform.key} title={`${platform.label} link coming soon`} aria-label={`${platform.label} link coming soon`}><b>{platform.mark}</b><span>{platform.label}</span><small>SOON</small></span>)}
+      ? <a key={platform.key} href={topic.social[platform.key]} target="_blank" rel="noreferrer" aria-label={`${topic.name} on ${platform.label}`} title={platform.label}>{platform.icon === 'external' ? <ArrowUpRight size={19} aria-hidden="true" /> : <SocialIcon name={platform.icon} />}</a>
+      : <span className="is-pending" key={platform.key} title={`${platform.label} link coming soon`} aria-label={`${platform.label} link coming soon`}><SocialIcon name={platform.icon} /></span>)}
   </div>
 }
 
 function TopicOrb({ topic, index }) {
   return <Link className={`blog-topic-orb ${topic.featured ? 'is-featured' : ''}`} to={`/blogs/${topic.slug}`} style={{ '--orb-color': topic.color }}>
-    <span className="blog-topic-orb-image">{topic.image ? <img src={topic.image} alt="" loading={index > 2 ? 'lazy' : 'eager'} /> : <span>{topic.name.slice(0, 1)}</span>}</span>
+    <span className="blog-topic-orb-image">{topic.image ? <img src={topic.profileImage || topic.image} alt="" loading={index > 2 ? 'lazy' : 'eager'} /> : <span>{topic.name.slice(0, 1)}</span>}</span>
     <strong>{topic.name}</strong><small>{topic.featured ? 'FEATURED' : 'EXPLORE'}</small>
   </Link>
 }
@@ -35,7 +36,7 @@ function TopicOrb({ topic, index }) {
 function BlogCard({ topic, post, className = '' }) {
   return <Link className={`blog-post-card ${className}`} to={postPath(topic, post)}>
     <div className="blog-post-card-image"><img src={post.images?.[0]?.src} alt={post.images?.[0]?.alt || ''} loading="lazy" /><span>{readableDay(post.id)}</span></div>
-    <div className="blog-post-card-copy"><small>{topic.name} / {post.isSample ? 'Preview entry' : 'Journal entry'}</small><h3>{post.title}</h3><p>{post.excerpt}</p><span className="blog-card-link">Read the entry <ArrowUpRight size={16} /></span></div>
+    <div className="blog-post-card-copy"><small>{topic.name} / Journal entry</small><h3>{post.title}</h3><p>{post.excerpt}</p><span className="blog-card-link">Read the entry <ArrowUpRight size={16} /></span></div>
   </Link>
 }
 
@@ -79,7 +80,7 @@ export function BlogTopicPage() {
     <div className="blog-topic-inner"><nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link to="/blogs">Journal</Link><ChevronRight size={14} /><span>{topic.name}</span></nav>
       <section className="blog-topic-hero"><div className="blog-topic-hero-copy"><p className="blog-kicker">{topic.featured ? 'THE FEATURED JOURNAL' : topic.category.toUpperCase()} / {topic.handle}</p><h1>{topic.name}<span>.</span></h1><p>{topic.description}</p><div className="blog-topic-hero-meta"><span>{String(topic.posts.length).padStart(2, '0')} ENTRIES</span><span>·</span><span>{topic.featured ? 'MEXICAN RED KNEE TARANTULA' : 'A NEW SPACE TO EXPLORE'}</span></div><TopicSocialLinks topic={topic} /></div><div className="blog-topic-hero-image">{topic.image ? <img src={topic.image} alt={topic.imageTemporary ? 'Temporary Mexican red knee tarantula reference' : topic.name} /> : <span>{topic.name.slice(0, 1)}</span>}<span className="blog-topic-image-tag">{topic.imageTemporary ? `REFERENCE PHOTO · NOT ${topic.name.toUpperCase()}` : 'THE TOPIC JOURNAL'}</span></div><div className="blog-topic-hero-orbit" aria-hidden="true">✳</div></section>
       <div className="blog-topic-toolbar"><div><small>THE CHAPTERS</small><h2>{topic.slug === 'ruby' ? 'Ruby’s little world' : `Stories from ${topic.name}`}<span>.</span></h2></div><BlogSearch value={query} onChange={setQuery} placeholder={`Search posts in ${topic.name}...`} /></div>
-      {posts.length ? <div className="blog-topic-posts">{posts.map((post, index) => <Link className="blog-topic-post-row" to={postPath(topic, post)} key={post.id}><span className="blog-topic-row-number">{String(index + 1).padStart(2, '0')}</span><div className="blog-topic-row-image"><img src={post.images?.[0]?.src} alt={post.images?.[0]?.alt || ''} loading="lazy" /></div><div><small>{readableDay(post.id)} / {post.isSample ? 'PREVIEW ENTRY' : 'THE JOURNAL'}</small><h3>{post.title}</h3><p>{post.excerpt}</p></div><span className="blog-topic-row-arrow"><ArrowUpRight size={22} /></span></Link>)}</div> : <div className="blog-topic-empty"><span>✳</span><h3>{query ? 'No chapter found.' : 'A story is taking shape.'}</h3><p>{query ? 'Try another search to explore this topic.' : 'The first post for this topic will appear here soon.'}</p></div>}
+      {posts.length ? <div className="blog-topic-posts">{posts.map((post, index) => <Link className="blog-topic-post-row" to={postPath(topic, post)} key={post.id}><span className="blog-topic-row-number">{String(index + 1).padStart(2, '0')}</span><div className="blog-topic-row-image"><img src={post.images?.[0]?.src} alt={post.images?.[0]?.alt || ''} loading="lazy" /></div><div><small>{readableDay(post.id)} / THE JOURNAL</small><h3>{post.title}</h3><p>{post.excerpt}</p></div><span className="blog-topic-row-arrow"><ArrowUpRight size={22} /></span></Link>)}</div> : <div className="blog-topic-empty"><span>✳</span><h3>{query ? 'No chapter found.' : 'A story is taking shape.'}</h3><p>{query ? 'Try another search to explore this topic.' : 'The first post for this topic will appear here soon.'}</p></div>}
       <div className="blog-topic-footer-card"><div><small>THE STORY CONTINUES</small><h2>Every day has<br />a new detail.</h2></div><p>{topic.featured ? 'This journal is ready for Ruby’s real photos, notes and reel links as her days unfold.' : 'A dedicated place for this topic’s future stories.'}</p><Link to="/blogs">Explore all topics <ArrowRight size={18} /></Link></div>
     </div>
   </div>
@@ -116,12 +117,12 @@ function VideoCard({ post, video }) {
 
 function SharePanel({ topic, post }) {
   const [copied, setCopied] = useState(false)
-  if (topic.slug === 'ruby') return <div className="blog-rail-share blog-rail-follow"><small>FOLLOW RUBY</small><TopicSocialLinks topic={topic} compact /><span>Her social pages are coming soon.</span></div>
+  if (topic.slug === 'ruby') return <div className="blog-rail-share blog-rail-follow"><small>FOLLOW RUBY</small><TopicSocialLinks topic={topic} compact /></div>
   const url = `${siteConfig.url}${postPath(topic, post)}`
   const encodedUrl = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(post.title)
   const copy = async () => { try { await navigator.clipboard.writeText(window.location.href); setCopied(true); window.setTimeout(() => setCopied(false), 2500) } catch { setCopied(false) } }
-  return <div className="blog-rail-share"><small>PASS THIS STORY ON</small><div><a href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`} target="_blank" rel="noreferrer" aria-label="Share on X">𝕏</a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on Facebook">f</a><a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on LinkedIn">in</a><a href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on WhatsApp">wa</a><button type="button" onClick={copy} aria-label="Copy article link">{copied ? <Check size={17} /> : <Link2 size={17} />}</button></div><span role="status">{copied ? 'Link copied to clipboard' : 'A little story worth sharing.'}</span></div>
+  return <div className="blog-rail-share"><small>PASS THIS STORY ON</small><div><a href={`https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`} target="_blank" rel="noreferrer" aria-label="Share on X"><SocialIcon name="x" size={17} /></a><a href={`https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on Facebook"><SocialIcon name="facebook" size={17} /></a><a href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on LinkedIn"><SocialIcon name="linkedin" size={17} /></a><a href={`https://api.whatsapp.com/send?text=${encodedTitle}%20${encodedUrl}`} target="_blank" rel="noreferrer" aria-label="Share on WhatsApp"><SocialIcon name="whatsapp" size={17} /></a><button type="button" onClick={copy} aria-label="Copy article link">{copied ? <Check size={17} /> : <Link2 size={17} />}</button></div><span role="status">{copied ? 'Link copied to clipboard' : 'A little story worth sharing.'}</span></div>
 }
 
 function Sidebar({ topic, currentId }) {
@@ -146,24 +147,28 @@ function Sidebar({ topic, currentId }) {
   return <aside className={`blog-entry-sidebar ${collapsed ? 'is-collapsed' : ''}`} style={{ width: collapsed ? 72 : width }} aria-label={`${topic.name} journal navigation`}>
     <div className="blog-entry-sidebar-top">
       <div className="blog-sidebar-control-row">
-        <button className={`blog-sidebar-toggle ${collapsed ? '' : 'is-expanded'}`} type="button" onClick={() => setCollapsed(value => !value)} aria-label={collapsed ? 'Expand journal sidebar' : 'Collapse journal sidebar'} aria-expanded={!collapsed}><span className="blog-sidebar-toggle-lines" aria-hidden="true"><i /><i /><i /></span></button>
         {!collapsed && <Link to={`/blogs/${topic.slug}`} className="blog-sidebar-back"><ArrowLeft size={16} /> {topic.name.toUpperCase()} / JOURNAL</Link>}
+        <button className={`blog-sidebar-toggle ${collapsed ? '' : 'is-expanded'}`} type="button" onClick={() => setCollapsed(value => !value)} aria-label={collapsed ? 'Expand journal sidebar' : 'Collapse journal sidebar'} aria-expanded={!collapsed}><span className="blog-sidebar-toggle-lines" aria-hidden="true"><i /><i /><i /></span></button>
       </div>
-      {collapsed ? <><Link className="blog-sidebar-icon-link" to={`/blogs/${topic.slug}`} title={`Back to ${topic.name}'s journal`} aria-label={`Back to ${topic.name}'s journal`}><ArrowLeft size={18} /></Link><button className="blog-sidebar-icon-link" type="button" title="Search the journal" aria-label="Expand and search journal" onClick={() => { setCollapsed(false); requestAnimationFrame(() => searchRef.current?.focus()) }}><Search size={18} /></button></> : <div className="blog-sidebar-search"><Search size={18} /><input ref={searchRef} type="search" placeholder="Search the journal..." value={search} onChange={event => setSearch(event.target.value)} aria-label="Search journal entries" /></div>}
+      {collapsed ? <button className="blog-sidebar-icon-link" type="button" title="Search the journal" aria-label="Expand and search journal" onClick={() => { setCollapsed(false); requestAnimationFrame(() => searchRef.current?.focus()) }}><Search size={18} /></button> : <div className="blog-sidebar-search"><Search size={18} /><input ref={searchRef} type="search" placeholder="Search the journal..." value={search} onChange={event => setSearch(event.target.value)} aria-label="Search journal entries" /></div>}
     </div>
     <div className="blog-sidebar-scroll">
       {!collapsed && <p className="blog-sidebar-label">ALL ENTRIES <span>{String(topic.posts.length).padStart(2, '0')}</span></p>}
       {entries.length ? entries.map(post => <Link key={post.id} to={postPath(topic, post)} title={collapsed ? post.title : undefined} aria-label={collapsed ? post.title : undefined} aria-current={post.id === currentId ? 'page' : undefined} className={`blog-sidebar-entry ${post.id === currentId ? 'is-active' : ''}`}>
-        {collapsed ? <BookOpen size={20} /> : <><span>{readableDay(post.id)}</span><strong>{post.title}</strong><ArrowUpRight size={16} /></>}
+        {collapsed ? <span>{String(topic.posts.indexOf(post) + 1).padStart(2, '0')}</span> : <><span>{readableDay(post.id)}</span><strong>{post.title}</strong><ArrowUpRight size={16} /></>}
       </Link>) : !collapsed && <p className="blog-sidebar-no-results">No entries match your search.</p>}
     </div>
-    <div className="blog-sidebar-bottom"><span className="blog-sidebar-avatar">{topic.image ? <img src={topic.image} alt="" /> : topic.name.slice(0, 1)}</span>{!collapsed && <div><strong>{topic.slug === 'ruby' ? 'Ruby’s world' : topic.name}</strong><small>{topic.shortDescription}</small></div>}</div>
+    <div className="blog-sidebar-bottom"><span className="blog-sidebar-avatar">{topic.image ? <img src={topic.profileImage || topic.image} alt="" /> : topic.name.slice(0, 1)}</span>{!collapsed && <div><strong>{topic.slug === 'ruby' ? 'Ruby’s world' : topic.name}</strong><small>{topic.shortDescription}</small></div>}</div>
     {!collapsed && <div className="blog-sidebar-resize" role="separator" aria-label="Resize journal sidebar" aria-orientation="vertical" aria-valuemin={240} aria-valuemax={440} aria-valuenow={width} tabIndex={0} onPointerDown={startResize} onKeyDown={event => { if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { event.preventDefault(); setWidth(value => clampSidebarWidth(value + (event.key === 'ArrowRight' ? 16 : -16))) } }}><span /></div>}
   </aside>
 }
 
 function ArticleSection({ section, index }) {
   return <section id={section.id} className={`blog-story-section blog-story-${section.type}`}><div className="blog-story-section-index"><span>{String(index + 1).padStart(2, '0')}</span><i /></div><div className="blog-story-section-content"><p className="blog-kicker">{section.eyebrow}</p>{section.type === 'question' ? <><h2><span>Q.</span> {section.title}</h2><div className="blog-story-answer"><span>A.</span><p>{section.answer}</p></div></> : <><h2>{section.title}</h2>{section.type === 'points' ? <ul>{section.items.map((item, pointIndex) => <li key={item}><span>{String(pointIndex + 1).padStart(2, '0')}</span>{item}<ArrowUpRight size={15} /></li>)}</ul> : section.paragraphs.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</>}</div></section>
+}
+
+function TableOfContents({ toc, className = '' }) {
+  return <nav className={`blog-rail-toc ${className}`} aria-label="On this page"><div className="blog-rail-title"><List size={17} /><strong>ON THIS PAGE</strong></div>{toc.map((item, index) => <a href={`#${item.id}`} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span>{item.title}</a>)}</nav>
 }
 
 export function BlogPostPage() {
@@ -176,9 +181,10 @@ export function BlogPostPage() {
   const words = [post.title, ...post.content, ...post.sections.flatMap(section => [...(section.paragraphs || []), section.answer || '', ...(section.items || [])])].join(' ').trim().split(/\s+/).length
   const readMinutes = Math.max(1, Math.ceil(words / 200))
   const toc = [{ id: 'the-beginning', title: 'The beginning' }, ...post.sections.map(section => ({ id: section.id, title: section.title })), { id: 'the-next-chapter', title: 'Next chapters' }]
-  return <div className={`blog-universe blog-entry-page ${topic.theme === 'ruby' ? 'blog-ruby-theme' : ''}`} style={{ '--topic-accent': topic.color }}><div className="blog-entry-layout"><Sidebar topic={topic} currentId={post.id} /><article className="blog-entry-main"><div className="blog-entry-top"><nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link to="/blogs">Journal</Link><ChevronRight size={14} /><Link to={`/blogs/${topic.slug}`}>{topic.name}</Link><ChevronRight size={14} /><span>{readableDay(post.id)}</span></nav><div className="blog-entry-title-row"><div><p className="blog-kicker"><span className="blog-live-dot" /> THE {topic.name.toUpperCase()} JOURNAL / {readableDay(post.id)}</p><h1>{post.title}<span>.</span></h1></div><span className="blog-entry-title-mark" aria-hidden="true">✳</span></div><div className="blog-entry-byline"><div className="blog-author-avatar"><img src={topic.author.image} alt="" /></div><div><strong>{topic.author.name}</strong><span>{topic.author.role || 'Topic author'}</span></div><i /><span><Clock3 size={15} /> {readMinutes} MIN READ</span>{post.isSample && <span className="blog-preview-badge">PREVIEW ENTRY</span>}</div><figure className="blog-entry-hero"><img src={post.images[0].src} alt={post.images[0].alt} /><figcaption><span>FIG 01 / {post.images[0].temporary ? `REFERENCE PHOTO · NOT ${topic.name.toUpperCase()}` : topic.name.toUpperCase()}</span>{post.images[0].source ? <a href={post.images[0].source} target="_blank" rel="noreferrer">{post.images[0].credit || topic.author.name} ↗</a> : <span>{post.images[0].credit || topic.author.name}</span>}</figcaption></figure></div>
+  return <div className={`blog-universe blog-entry-page ${topic.theme === 'ruby' ? 'blog-ruby-theme' : ''}`} style={{ '--topic-accent': topic.color }}><div className="blog-entry-layout"><Sidebar topic={topic} currentId={post.id} /><article className="blog-entry-main"><div className="blog-entry-top"><nav className="blog-breadcrumb" aria-label="Breadcrumb"><Link to="/blogs">Journal</Link><ChevronRight size={14} /><Link to={`/blogs/${topic.slug}`}>{topic.name}</Link><ChevronRight size={14} /><span>{readableDay(post.id)}</span></nav><div className="blog-entry-title-row"><div><p className="blog-kicker"><span className="blog-live-dot" /> THE {topic.name.toUpperCase()} JOURNAL / {readableDay(post.id)}</p><h1>{post.title}<span>.</span></h1></div><span className="blog-entry-title-mark" aria-hidden="true">✳</span></div><div className="blog-entry-byline"><div className="blog-author-avatar"><img src={topic.author.image} alt="" /></div><div><strong>{topic.author.name}</strong><span>{topic.author.role || 'Topic author'}</span></div><i /><span><Clock3 size={15} /> {readMinutes} MIN READ</span></div><figure className="blog-entry-hero"><img src={post.images[0].src} alt={post.images[0].alt} /><figcaption><span>FIG 01 / {post.images[0].temporary ? `REFERENCE PHOTO · NOT ${topic.name.toUpperCase()}` : topic.name.toUpperCase()}</span>{post.images[0].source ? <a href={post.images[0].source} target="_blank" rel="noreferrer">{post.images[0].credit || topic.author.name} ↗</a> : <span>{post.images[0].credit || topic.author.name}</span>}</figcaption></figure></div>
+        <TableOfContents toc={toc} className="blog-rail-toc-mobile" />
         <div className="blog-entry-lower"><div className="blog-entry-story"><div id="the-beginning" className="blog-story-intro"><p className="blog-kicker">THE BEGINNING / {readableDay(post.id)}</p>{post.content.map((paragraph, index) => <p key={index}>{paragraph}</p>)}</div>{post.sections.map((section, index) => <div key={section.id}><ArticleSection section={section} index={index} />{index === 0 && post.images?.[1] && <figure className="blog-entry-inline-image"><img src={post.images[1].src} alt={post.images[1].alt} loading="lazy" /><figcaption><span>FIG 02 / {post.images[1].temporary ? `REFERENCE PHOTO · NOT ${topic.name.toUpperCase()}` : topic.name.toUpperCase()}</span>{post.images[1].source ? <a href={post.images[1].source} target="_blank" rel="noreferrer">{post.images[1].credit || topic.author.name} ↗</a> : <span>{post.images[1].credit || topic.author.name}</span>}</figcaption></figure>}</div>)}<div className="blog-story-endmark">✳</div><div className="blog-story-tags">{post.tags?.map(tag => <span key={tag}>#{tag.replace(/\s+/g, '')}</span>)}</div></div>
-          <aside className="blog-entry-rail" aria-label="Article extras"><div className="blog-rail-toc"><div className="blog-rail-title"><List size={17} /><strong>ON THIS PAGE</strong></div>{toc.map((item, index) => <a href={`#${item.id}`} key={item.id}><span>{String(index + 1).padStart(2, '0')}</span>{item.title}</a>)}</div>{post.video?.url && <VideoCard key={`${topic.slug}-${post.id}`} post={post} video={video} />}<SharePanel topic={topic} post={post} /><div className="blog-rail-promo"><span>✳ THE {topic.name.toUpperCase()} JOURNAL</span><h3>There’s more to the story.</h3><p>{topic.slug === 'ruby' ? 'Follow every little chapter as Ruby’s world grows.' : 'Explore more stories from this journal.'}</p><Link to={`/blogs/${topic.slug}`}>Explore the journal <ArrowUpRight size={17} /></Link></div></aside>
+          <aside className="blog-entry-rail" aria-label="Article extras"><TableOfContents toc={toc} className="blog-rail-toc-desktop" />{post.video?.url && <VideoCard key={`${topic.slug}-${post.id}`} post={post} video={video} />}<SharePanel topic={topic} post={post} />{topic.slug !== 'ruby' && <div className="blog-rail-promo"><span>✳ THE {topic.name.toUpperCase()} JOURNAL</span><h3>There’s more to the story.</h3><p>{'Explore more stories from this journal.'}</p><Link to={`/blogs/${topic.slug}`}>Explore the journal <ArrowUpRight size={17} /></Link></div>}</aside>
         </div><section id="the-next-chapter" className="blog-related"><div className="blog-section-heading"><div><small>KEEP EXPLORING</small><h2>The next chapters<span>.</span></h2></div><span className="blog-section-count">SCROLL TO EXPLORE <ArrowRight size={17} /></span></div>{related.length ? <div className="blog-related-scroll">{related.map(entry => <BlogCard key={entry.id} topic={topic} post={entry} />)}</div> : <div className="blog-related-soon"><div><span>DAY 02 / A SPACE FOR WHAT'S NEXT</span><h3>The story has only just begun.</h3><p>The next entry will appear here when Ruby has another moment to share.</p></div><Link to={`/blogs/${topic.slug}`}>Back to Ruby’s journal <ArrowUpRight size={18} /></Link></div>}</section>
       </article></div></div>
 }

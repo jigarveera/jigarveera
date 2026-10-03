@@ -17,6 +17,5 @@ export default function ScrollProgress({ blog = false, pathname }) {
   }, [blog, pathname])
   return <div className={`scroll-progress ${blog ? 'scroll-progress-blog' : ''}`} role={blog ? 'progressbar' : undefined} aria-label={blog ? 'Page reading progress' : undefined} aria-valuenow={blog ? Math.round(progress * 100) : undefined} aria-valuemin={blog ? 0 : undefined} aria-valuemax={blog ? 100 : undefined}>
     <i aria-hidden="true" style={{ transform: `scaleX(${progress})` }} />
-    {blog && <span className="blog-progress-label" aria-label={`${Math.round(progress * 100)} percent read`}>READ <strong>{String(Math.round(progress * 100)).padStart(2, '0')}%</strong></span>}
   </div>
 }
