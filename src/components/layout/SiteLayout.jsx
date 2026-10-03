@@ -5,8 +5,10 @@ import { siteConfig, whatsappUrl } from '../../data/siteData'
 import MobileNav from './MobileNav'
 import ScrollProgress from '../motion/ScrollProgress'
 import usePageSeo from '../../hooks/usePageSeo'
+import { getTopic } from '../../data/blogData'
+import BlogShareFloat from '../blog/BlogShareFloat'
 
-const nav = [['Work', '/work'], ['Services', '/services'], ['About', '/about'], ['Contact', '/contact']]
+const nav = [['Work', '/work'], ['Services', '/services'], ['Blog', '/blogs'], ['About', '/about'], ['Contact', '/contact']]
 
 function LocalTime() {
   const format = () => new Intl.DateTimeFormat('en-IN', { timeZone: siteConfig.timezone, hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date())
@@ -20,6 +22,8 @@ export default function SiteLayout({ children }) {
   const [scrolled, setScrolled] = useState(false)
   const menuButtonRef = useRef(null)
   const location = useLocation()
+  const isBlog = location.pathname.startsWith('/blogs')
+  const blogTopic = isBlog ? getTopic(location.pathname.split('/')[2]) : null
   const closeMenu = useCallback(() => setOpen(false), [])
   usePageSeo(location.pathname)
 
@@ -34,8 +38,8 @@ export default function SiteLayout({ children }) {
   }, [])
 
   return (
-    <div className="site-shell">
-      <ScrollProgress />
+    <div className={`site-shell ${isBlog ? 'site-shell-blog' : ''}`} style={isBlog ? { '--blog-progress-color': blogTopic?.color || '#e96b3b' } : undefined}>
+      <ScrollProgress blog={isBlog} pathname={location.pathname} />
       <a className="skip-link" href="#main">Skip to content</a>
       <header className={`site-header ${scrolled ? 'is-scrolled' : ''}`}>
         <Link to="/" className="brand" aria-label="Jigar Veera home"><span>JV</span><i /></Link>
@@ -55,11 +59,11 @@ export default function SiteLayout({ children }) {
           <Link to="/" className="footer-brand">Jigar<br />Veera<span>.</span></Link>
           <div><small>Contact</small><a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a><a href={whatsappUrl()} target="_blank" rel="noreferrer">WhatsApp</a></div>
           <div><small>Explore</small><Link to="/services">Services</Link><Link to="/work">Selected work</Link><Link to="/about">About</Link></div>
-          <div><small>Social</small><a href={siteConfig.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a><a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub ↗</a></div>
+          {blogTopic?.slug === 'ruby' ? <div><small>Ruby social</small>{[['Instagram', 'instagram'], ['Facebook', 'facebook'], ['YouTube Shorts', 'youtubeShorts']].map(([label, key]) => blogTopic.social?.[key] ? <a key={key} href={blogTopic.social[key]} target="_blank" rel="noreferrer">{label} ↗</a> : <span key={key}>{label} · soon</span>)}</div> : <div><small>Social</small><a href={siteConfig.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a><a href={siteConfig.github} target="_blank" rel="noreferrer">GitHub ↗</a></div>}
         </div>
         <div className="footer-legal"><span>© {new Date().getFullYear()} Jigar Veera</span><LocalTime /><span><Link to="/privacy">Privacy</Link> · <Link to="/terms">Terms</Link></span></div>
       </footer>
-      <a className="whatsapp-float" href={whatsappUrl()} target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp"><MessageCircle size={21} /><span>Let’s talk</span></a>
+      {isBlog ? <BlogShareFloat pathname={location.pathname} /> : <a className="whatsapp-float" href={whatsappUrl()} target="_blank" rel="noreferrer" aria-label="Chat on WhatsApp"><MessageCircle size={21} /><span>Let’s talk</span></a>}
     </div>
   )
 }

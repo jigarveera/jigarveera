@@ -4,7 +4,7 @@ import { X } from 'lucide-react'
 import { NavLink } from 'react-router-dom'
 import { siteConfig } from '../../data/siteData'
 
-const nav = [['Work', '/work'], ['Services', '/services'], ['About', '/about'], ['Contact', '/contact']]
+const nav = [['Work', '/work'], ['Services', '/services'], ['Blog', '/blogs'], ['About', '/about'], ['Contact', '/contact']]
 
 export default function MobileNav({ open, onClose, triggerRef }) {
   const panelRef = useRef(null)

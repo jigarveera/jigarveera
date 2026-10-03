@@ -6,6 +6,7 @@ import { ContactPage, ContentPage, LegalPage, ServicePage } from './components/p
 import WorkPage from './components/work/WorkPage'
 import ProjectPage from './components/work/ProjectPage'
 import NotFoundPage from './components/pages/NotFoundPage'
+import { BlogIndexPage, BlogPostPage, BlogTopicPage } from './components/blog/BlogPages'
 
 const AboutPage = lazy(() => import('./components/about/AboutPage'))
 
@@ -14,6 +15,9 @@ export default function App() {
     <Route path="/" element={<HomePage />} />
     <Route path="/services" element={<ContentPage type="services" />} />
     <Route path="/services/:slug" element={<ServicePage />} />
+    <Route path="/blogs" element={<BlogIndexPage />} />
+    <Route path="/blogs/:topicSlug" element={<BlogTopicPage />} />
+    <Route path="/blogs/:topicSlug/:postId" element={<BlogPostPage />} />
     <Route path="/work" element={<WorkPage />} />
     <Route path="/work/commerce-made-calm" element={<Navigate to="/work/your-literary-world" replace />} />
     <Route path="/work/:slug" element={<ProjectPage />} />
